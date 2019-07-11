@@ -18,38 +18,69 @@
     #mapcanvas{
       height:100%;
     }
+    #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 40%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
   </style>
 
   <script>
-   var geoJsonObject;
-   var thejson;
+   var states, colonies;
+
    $(document).ready(function(){
     var mapOptions = {
       zoom: 5,
       center: new google.maps.LatLng(21, -100),
-      mapTypeId: google.maps.MapTypeId.TERRAIN
+      mapTypeId: google.maps.MapTypeId.TERRAIN,
+      streetViewControl: false
     };
     map=new google.maps.Map($('#mapcanvas')[0], mapOptions);
-    $.getJSON("munipalities_id_02_09_15_simplified.json", function(data){
-          geoJsonObject = topojson.feature(data, data.objects.munipalities_id_02_09_15_simplified)
-          map.data.addGeoJson(geoJsonObject);
-          map.data.setStyle({
-              strokeColor: '#ffffff',
-              strokeOpacity: 0.7,
-              strokeWeight: 1,
-              fillColor: '#ff0000',
-              fillOpacity: 0.35
-          });
-        });
-    /* var kmlPoints = new google.maps.KmlLayer({
-      url: 'https://github.com/artorresv/varios/blob/master/1.kmz?raw=true',
+    
+    colonies = new google.maps.KmlLayer({
+      url: 'https://github.com/artorresv/varios/blob/master/neighborhoods_datos.kmz?raw=true',
+      map: null  
+    });
+    states = new google.maps.KmlLayer({
+      url: 'https://github.com/artorresv/varios/blob/master/states.kmz?raw=true',
       map: map  
-    }); */
-  });//end document ready
+    });
+  });
+
+  function changeVisibility(layer) {
+    switch (layer) {
+      case 'states':
+        states.getMap() ? states.setMap(null) : states.setMap(map);
+        break;
+      case 'municipalities':
+        municipalities.getMap() ? municipalities.setMap(null) : municipalities.setMap(map);
+        break;
+      case 'neigborhoods':
+        colonies.getMap() ? colonies.setMap(null) : colonies.setMap(map);
+        break;
+      default:
+        postal.getMap() ? postal.setMap(null) : postal.setMap(map);
+    }
+  }
+  //end document ready
  </script>
  
 </head>
 <body>
+  <div id="floating-panel">
+      <input onclick="changeVisibility('states');" type=button id="statesBtn" value="States">
+      <input onclick="changeVisibility('municipalities');" type=button value="Municipalities">
+      <input onclick="changeVisibility('neigborhoods');" type=button value="Neigborhoods">
+      <input onclick="changeVisibility('postal');" type=button value="Postal Codes">
+    </div>
   <div id="mapcanvas">
   </div>
 </body>
